@@ -13,7 +13,7 @@ export default function Chapter4Personalize() {
   useFrame(() => {
     if (!groupRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.40) / 0.06)
+    const enter = clamp01((p - 0.44) / 0.05)
     const exit = clamp01((p - 0.60) / 0.06)
     const activeWeight = enter * (1 - exit)
 

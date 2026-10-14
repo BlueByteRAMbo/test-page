@@ -3,8 +3,9 @@
 import React, { useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
-import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
+import { scrollState, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import Envelope from '../models/Envelope'
 
 export default function Chapter1Hero() {
   const groupRef = useRef<THREE.Group>(null)
@@ -12,43 +13,33 @@ export default function Chapter1Hero() {
 
   useFrame((state) => {
     if (!groupRef.current) return
-    const p = chapterProgress(ch.range)
+    const p = scrollState.progress
     const time = state.clock.getElapsedTime()
 
-    // Smooth entry and exit scale/visibility
-    // Chapter 1 is fully visible at start [0, 0.14], exits as chapter 2 takes over
-    const exitP = clamp01((scrollState.progress - 0.12) / 0.06)
-    const opacity = 1 - exitP
-    const scale = 1 - exitP * 0.25
+    // Chapter 1 is active from 0 to ~0.15
+    const isVisible = p < 0.16
+    groupRef.current.visible = isVisible
 
-    groupRef.current.visible = opacity > 0.01
-    groupRef.current.scale.setScalar(scale)
+    if (!isVisible) return
 
-    // Gentle physical hover floating
-    groupRef.current.position.y = ch.actorPosition[1] + Math.sin(time * 1.8) * 0.04
-    groupRef.current.rotation.y = Math.sin(time * 0.9) * 0.05
-    groupRef.current.rotation.z = Math.cos(time * 1.2) * 0.02
+    // Subtle physical floating hover
+    const hoverY = Math.sin(time * 1.8) * 0.04
+    const hoverRotY = Math.sin(time * 0.9) * 0.04
+    const hoverRotZ = Math.cos(time * 1.2) * 0.02
+
+    groupRef.current.position.y = ch.actorPosition[1] + hoverY
+    groupRef.current.rotation.y = hoverRotY
+    groupRef.current.rotation.z = hoverRotZ
   })
+
+  // Calculate flap opening and seal fracture towards end of Ch 1
+  const p = scrollState.progress
+  const flapAngle = clamp01((p - 0.12) / 0.04) * Math.PI * 0.95
+  const sealOpacity = clamp01(1 - (p - 0.11) / 0.03)
 
   return (
     <group ref={groupRef} position={ch.actorPosition}>
-      {/* Envelope Body Placeholder */}
-      <mesh castShadow receiveShadow position={[0, 0, 0]}>
-        <boxGeometry args={[1.8, 1.2, 0.08]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.7} metalness={0.05} />
-      </mesh>
-
-      {/* Flap Accent */}
-      <mesh position={[0, 0.2, 0.05]} rotation={[0, 0, Math.PI / 4]}>
-        <planeGeometry args={[0.85, 0.85]} />
-        <meshStandardMaterial color="#f8f7f4" roughness={0.65} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* Wax Seal Medallion */}
-      <mesh position={[0, -0.05, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.18, 0.18, 0.04, 32]} />
-        <meshStandardMaterial color="#dc2626" roughness={0.3} metalness={0.1} />
-      </mesh>
+      <Envelope flapAngle={flapAngle} sealOpacity={sealOpacity} />
     </group>
   )
 }

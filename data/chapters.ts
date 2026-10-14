@@ -73,8 +73,8 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Faceted origami plane', 'Studio display workstation', '99% confidence lock'],
     range: [0.28, 0.44],
     camera: {
-      position: [0.25, 0.25, 4.9],
-      target: [0.6, 0.08, 0],
+      position: [0.35, 0.25, 5.3],
+      target: [0.35, 0.05, 0],
       fov: 40,
     },
     actorPosition: [1.1, 0.1, 0],
