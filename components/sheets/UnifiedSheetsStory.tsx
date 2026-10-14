@@ -834,7 +834,7 @@ export default function UnifiedSheetsStory() {
   }, [])
 
   return (
-    <section ref={stageContainerRef} className="relative w-full bg-[#f4f3ef] z-20 overflow-visible">
+    <section id="how-it-works" ref={stageContainerRef} className="relative w-full bg-[#f4f3ef] z-20 overflow-visible">
       {/* 
         Pinned 100vh Viewport
       */}
@@ -845,7 +845,10 @@ export default function UnifiedSheetsStory() {
       >
         {/* Soft Radial Ambient Lighting */}
         <div className="absolute inset-0 pointer-events-none paper-pattern opacity-70" />
-        <div className="absolute w-[800px] h-[600px] rounded-full bg-radial from-emerald-100/30 via-emerald-50/10 to-transparent blur-3xl pointer-events-none" />
+        <div
+          className="absolute w-[800px] h-[600px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(209, 250, 229, 0.3) 0%, rgba(236, 253, 245, 0.1) 50%, transparent 70%)' }}
+        />
 
         {/* Floating Pedestal Shadow beneath the 3D Stage */}
         <div className="stage-pedestal" />
@@ -860,7 +863,9 @@ export default function UnifiedSheetsStory() {
             {storyBeats.map((b, idx) => (
               <div
                 key={b.id}
-                ref={(el) => (narrativeTextsRef.current[idx] = el)}
+                ref={(el) => {
+                  narrativeTextsRef.current[idx] = el
+                }}
                 className="w-full absolute inset-0 flex flex-col justify-center"
                 style={{ display: idx === 0 ? 'flex' : 'none' }}
               >

@@ -15,6 +15,7 @@ dist
 # Temporary preview captures and frame audits
 /animation-frames/
 preview-*.png
+phase*-*.png
 frame-audit.json
 
 # Environment variables

@@ -101,7 +101,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-[#111111]/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8e928c]">
           <div>© {new Date().getFullYear()} Eextramile AI. All rights reserved.</div>
           <div className="flex items-center gap-6">
-            <span>Concept 3 — Sheets Implementation</span>
+            <span>Automated Recruiter Outreach</span>
             <span>·</span>
             <span>Minimalist 3D Scroll Experience</span>
           </div>

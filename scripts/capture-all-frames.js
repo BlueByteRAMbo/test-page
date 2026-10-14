@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 async function captureAllFrames() {
-  const framesDir = path.join(__dirname, 'animation-frames');
+  const framesDir = path.join(__dirname, '..', 'animation-frames');
   if (!fs.existsSync(framesDir)) {
     fs.mkdirSync(framesDir, { recursive: true });
   }
@@ -98,7 +98,7 @@ async function captureAllFrames() {
   }
 
   fs.writeFileSync(
-    path.join(__dirname, 'frame-audit.json'),
+    path.join(__dirname, '..', 'frame-audit.json'),
     JSON.stringify(frameAudit, null, 2),
     'utf-8'
   );

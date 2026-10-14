@@ -18,7 +18,7 @@ export const storyChapters: StoryChapter[] = [
     number: '01',
     railLabel: 'Hero',
     railSubtitle: 'The idea of Sheets',
-    eyebrow: 'EEXTRAMILE AI · CONCEPT 3',
+    eyebrow: 'EEXTRAMILE AI · AUTOMATED OUTREACH',
     titlePrefix: 'Manually emailing 300 recruiters takes a month. We do it',
     titleItalic: 'before lunch.',
     description: 'Find recruiters, write personalised emails, and send them from your Gmail — automatically.',
@@ -27,8 +27,7 @@ export const storyChapters: StoryChapter[] = [
       'AI email personalisation tailored to your real background',
       'Sent directly from your connected Gmail account',
       'Automatic Day 3 & 4 follow-ups with instant reply stopping'
-    ],
-    metrics: { label: 'Recruiter emails found this week', value: '704+' }
+    ]
   },
   {
     id: 'highlights',

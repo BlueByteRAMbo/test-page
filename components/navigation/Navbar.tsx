@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -28,7 +28,7 @@ export default function Navbar() {
           {/* Logo */}
           <a href="#" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-white border border-[#111111]/10 flex items-center justify-center p-1 shadow-sm transition-transform group-hover:scale-105">
-              <img src="/logo.png" alt="Eextramile AI logo" className="w-full h-full object-contain" />
+              <Image src="/logo.png" alt="Eextramile AI logo" width={32} height={32} className="w-full h-full object-contain" priority />
             </div>
             <div className="flex items-baseline font-medium tracking-tight text-lg text-[#111111]">
               <span className="text-[#16a34a] font-bold text-xl">E</span>
@@ -42,20 +42,13 @@ export default function Navbar() {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-[14px] text-[#626660]">
             <a
-              href="#story-stage"
-              className="hover:text-[#111111] transition-colors font-medium flex items-center gap-1.5"
+              href="#how-it-works"
+              className="hover:text-[#111111] transition-colors font-medium"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#16a34a]" />
               How it works
-            </a>
-            <a href="#pipeline" className="hover:text-[#111111] transition-colors font-medium">
-              The 3D Pipeline
             </a>
             <a href="#pricing" className="hover:text-[#111111] transition-colors font-medium">
               Pricing
-            </a>
-            <a href="#testimonials" className="hover:text-[#111111] transition-colors font-medium">
-              Success stories
             </a>
             <a href="#faq" className="hover:text-[#111111] transition-colors font-medium">
               FAQ
