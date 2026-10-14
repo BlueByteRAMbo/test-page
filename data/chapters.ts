@@ -131,10 +131,10 @@ export const CHAPTERS: ChapterData[] = [
     range: [0.74, 0.88],
     camera: {
       position: [0.35, 0.12, 4.7],
-      target: [0.55, 0, 0],
+      target: [0.65, 0, 0],
       fov: 40,
     },
-    actorPosition: [1.1, 0, 0],
+    actorPosition: [1.32, 0, 0],
   },
   {
     id: 'settle',

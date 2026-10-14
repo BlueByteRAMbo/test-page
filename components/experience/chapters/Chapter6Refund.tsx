@@ -1,71 +1,179 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import Coin from '../models/Coin'
+import Vault from '../models/Vault'
 
+/**
+ * Chapter 6: Bounce Shield & Credit Refund
+ * Range: [0.74, 0.88]
+ * - Bounced recruiter terminal flags 550 5.1.1 error (balanced on right half)
+ * - Minted 3D physical gold coin launches in 720° parabolic arc
+ * - Deposits into Executive Vault slot; OLED increments to 51 CREDITS
+ */
 export default function Chapter6Refund() {
-  const groupRef = useRef<THREE.Group>(null)
-  const coinRef = useRef<THREE.Group>(null)
-  const vaultRef = useRef<THREE.Group>(null)
+  const rootRef = useRef<THREE.Group>(null)
+  const coinGroupRef = useRef<THREE.Group>(null)
+  const bounceScreenRef = useRef<THREE.Group>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const textureRef = useRef<THREE.CanvasTexture | null>(null)
+
   const ch = CHAPTERS[5]
 
+  // Dynamic Bounced Terminal Texture (512x320)
+  const { canvas, texture } = useMemo(() => {
+    if (typeof document === 'undefined') {
+      return { canvas: null, texture: null }
+    }
+    const c = document.createElement('canvas')
+    c.width = 512
+    c.height = 320
+    const tex = new THREE.CanvasTexture(c)
+    tex.generateMipmaps = true
+    tex.minFilter = THREE.LinearMipmapLinearFilter
+    canvasRef.current = c
+    textureRef.current = tex
+
+    const ctx = c.getContext('2d')
+    if (ctx) {
+      // Dark Terminal Card
+      ctx.fillStyle = '#0f172a'
+      ctx.fillRect(0, 0, c.width, c.height)
+      ctx.strokeStyle = '#ef4444'
+      ctx.lineWidth = 3
+      ctx.strokeRect(4, 4, c.width - 8, c.height - 8)
+
+      // Header Bar
+      ctx.fillStyle = '#1e293b'
+      ctx.fillRect(4, 4, c.width - 8, 48)
+
+      ctx.fillStyle = '#ef4444'
+      ctx.beginPath()
+      ctx.arc(24, 28, 6, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'left'
+      ctx.fillText('DELIVERY FAILURE DETECTED', 42, 33)
+
+      // Details
+      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#f8fafc'
+      ctx.fillText('Alex Morgan · Scale AI', 24, 90)
+
+      ctx.font = '500 16px monospace'
+      ctx.fillStyle = '#94a3b8'
+      ctx.fillText('alex.morgan@scale.com', 24, 122)
+
+      // Error Code Badge
+      ctx.fillStyle = '#450a0a'
+      ctx.beginPath()
+      ctx.roundRect(24, 146, 360, 38, 8)
+      ctx.fill()
+      ctx.strokeStyle = '#ef4444'
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      ctx.font = '700 15px monospace'
+      ctx.fillStyle = '#fca5a5'
+      ctx.fillText('SMTP 550 5.1.1: Mailbox Unknown', 38, 171)
+
+      // Shield Action
+      ctx.fillStyle = '#064e3b'
+      ctx.beginPath()
+      ctx.roundRect(24, 215, 380, 46, 8)
+      ctx.fill()
+      ctx.strokeStyle = '#10b981'
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#6ee7b7'
+      ctx.fillText('🛡️ BOUNCE SHIELD: +1 CREDIT RECOVERY', 38, 244)
+
+      tex.needsUpdate = true
+    }
+
+    return { canvas: c, texture: tex }
+  }, [])
+
   useFrame(() => {
-    if (!groupRef.current) return
+    if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.70) / 0.06)
-    const exit = clamp01((p - 0.88) / 0.06)
+    const enter = clamp01((p - 0.72) / 0.04)
+    const exit = clamp01((p - 0.88) / 0.03)
     const activeWeight = enter * (1 - exit)
 
-    groupRef.current.visible = activeWeight > 0.01
+    rootRef.current.visible = activeWeight > 0.01
+    if (!rootRef.current.visible) return
 
     const localP = chapterProgress(ch.range)
 
-    // Parabolic arc for gold coin toward vault
-    if (coinRef.current) {
-      // Moves from -1.4 to +1.0
-      const arcX = -1.4 + localP * 2.4
-      const arcY = Math.sin(localP * Math.PI) * 0.9 + 0.1
-      coinRef.current.position.set(arcX, arcY, 0.2)
-      coinRef.current.rotation.y = localP * Math.PI * 4
-      coinRef.current.rotation.x = localP * Math.PI * 2
-    }
+    // Subtle scale breathing
+    rootRef.current.scale.setScalar(0.92 + activeWeight * 0.08)
 
-    // Vault pulses slightly as coin approaches
-    if (vaultRef.current) {
-      const pulse = localP > 0.7 ? 1 + Math.sin((localP - 0.7) * 20) * 0.05 : 1
-      vaultRef.current.scale.setScalar(pulse)
+    // Parabolic arc for 3D Gold Coin
+    if (coinGroupRef.current) {
+      if (localP < 0.16) {
+        // Resting on the bounced terminal
+        coinGroupRef.current.visible = true
+        coinGroupRef.current.position.set(-0.35, 0.15, 0.1)
+        coinGroupRef.current.rotation.set(0, 0, 0)
+        coinGroupRef.current.scale.setScalar(clamp01(localP / 0.15))
+      } else if (localP <= 0.72) {
+        // Parabolic trajectory towards vault slot at [0.78, 0.65, 0.0]
+        coinGroupRef.current.visible = true
+        const arcT = (localP - 0.16) / 0.56
+        const sx = -0.35
+        const ex = 0.78
+        const currentX = sx + (ex - sx) * arcT
+        const currentY = 0.15 + (0.65 - 0.15) * arcT + Math.sin(arcT * Math.PI) * 0.55
+        const currentZ = 0.1 * (1 - arcT)
+
+        coinGroupRef.current.position.set(currentX, currentY, currentZ)
+        coinGroupRef.current.rotation.set(arcT * Math.PI * 4, arcT * Math.PI * 6, 0)
+        coinGroupRef.current.scale.setScalar(0.9)
+      } else {
+        // Coin cleanly deposited inside the vault
+        coinGroupRef.current.visible = false
+      }
     }
   })
 
+  const bounceMat = useMemo(() => {
+    if (!texture) return new THREE.MeshBasicMaterial({ color: '#0f172a' })
+    return new THREE.MeshBasicMaterial({ map: texture })
+  }, [texture])
+
   return (
-    <group ref={groupRef} position={ch.actorPosition}>
-      {/* 3D Gold Credit Coin */}
-      <group ref={coinRef} position={[-1.4, 0.1, 0.2]}>
-        <mesh castShadow receiveShadow rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.3, 0.3, 0.06, 48]} />
-          <meshStandardMaterial
-            color="#fbbf24"
-            roughness={0.25}
-            metalness={0.95}
-            envMapIntensity={1.5}
-          />
+    <group ref={rootRef} position={ch.actorPosition}>
+      {/* 1. Bounced Recruiter Notification Monitor (Shifted right to avoid text overlap) */}
+      <group ref={bounceScreenRef} position={[-0.35, 0.05, 0]} scale={0.75}>
+        {/* Chassis */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[1.35, 0.95, 0.05]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
+        </mesh>
+        {/* Screen Surface */}
+        <mesh position={[0, 0, 0.027]}>
+          <planeGeometry args={[1.28, 0.88]} />
+          <primitive object={bounceMat} attach="material" />
         </mesh>
       </group>
 
-      {/* Obsidian Executive Vault */}
-      <group ref={vaultRef} position={[1.0, 0, 0]}>
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[1.2, 1.4, 0.6]} />
-          <meshStandardMaterial color="#18181b" roughness={0.3} metalness={0.8} />
-        </mesh>
-        {/* Vault Door Inset */}
-        <mesh position={[0, 0, 0.31]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.4, 0.4, 0.04, 32]} />
-          <meshStandardMaterial color="#22c55e" roughness={0.3} metalness={0.4} />
-        </mesh>
+      {/* 2. Parabolic 3D Gold Credit Coin */}
+      <group ref={coinGroupRef} position={[-0.35, 0.15, 0.1]}>
+        <Coin scale={0.85} />
+      </group>
+
+      {/* 3. Obsidian & Platinum Executive Vault (Right) */}
+      <group position={[0.78, 0, 0]}>
+        <Vault scale={0.85} />
       </group>
     </group>
   )

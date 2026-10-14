@@ -50,12 +50,12 @@ export default function CameraRig() {
 
     // Mobile adjustments: center horizontally on actor (x = 1.1) and frame in upper 55%
     if (isMobile) {
-      desiredFov += 6
+      desiredFov += 8
       targetPos.x = 1.1
-      targetPos.y = -0.6
-      targetPos.z += 0.8
+      targetPos.y = -0.52
+      targetPos.z += 1.2
       targetLookAt.x = 1.1
-      targetLookAt.y = 0.0
+      targetLookAt.y = -0.52
     }
 
     // Pointer Parallax (Restrained to <= 0.18 units for subtle Apple-like depth)

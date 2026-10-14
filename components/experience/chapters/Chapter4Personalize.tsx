@@ -5,57 +5,64 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import Composer from '../models/Composer'
+import OrigamiPlane from '../models/OrigamiPlane'
 
+/**
+ * Chapter 4: Personalise & Send
+ * Range: [0.44, 0.60]
+ * - Center workstation expands into 3D Apple/Linear-grade Composer
+ * - Dynamic typing reveals email copy with highlighted career achievements
+ * - Physical 3D send button clicks down with mechanical spring depression
+ * - Dispatched confirmation toast and origami plane launch into flight
+ */
 export default function Chapter4Personalize() {
-  const groupRef = useRef<THREE.Group>(null)
+  const rootRef = useRef<THREE.Group>(null)
+  const planeRef = useRef<THREE.Group>(null)
   const ch = CHAPTERS[3]
 
   useFrame(() => {
-    if (!groupRef.current) return
+    if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.44) / 0.05)
-    const exit = clamp01((p - 0.60) / 0.06)
+    const enter = clamp01((p - 0.43) / 0.04)
+    const exit = clamp01((p - 0.60) / 0.03)
     const activeWeight = enter * (1 - exit)
 
-    groupRef.current.visible = activeWeight > 0.01
+    rootRef.current.visible = activeWeight > 0.01
+    if (!rootRef.current.visible) return
 
     const localP = chapterProgress(ch.range)
-    groupRef.current.scale.setScalar(0.9 + activeWeight * 0.1)
+
+    // 1. Composer entrance & scale
+    rootRef.current.scale.setScalar(0.92 + activeWeight * 0.08)
+
+    // 2. Dispatched Origami Plane Flight: 0.72 -> 1.0
+    if (planeRef.current) {
+      if (localP > 0.70) {
+        planeRef.current.visible = true
+        const flightT = clamp01((localP - 0.70) / 0.28)
+        // Launches forward from right side of composer and banks away smoothly
+        const px = 0.4 + flightT * 1.1
+        const py = 0.1 + Math.sin(flightT * Math.PI) * 0.35
+        const pz = 0.08 + flightT * 0.9
+        planeRef.current.position.set(px, py, pz)
+        planeRef.current.rotation.set(-0.15, 0.3 + flightT * 0.4, -flightT * 0.35)
+        planeRef.current.scale.setScalar(0.48 + flightT * 0.15)
+      } else {
+        planeRef.current.visible = false
+      }
+    }
   })
 
   return (
-    <group ref={groupRef} position={ch.actorPosition}>
-      {/* Expanded Glass Composer Window */}
-      <mesh castShadow receiveShadow position={[0, 0, 0]}>
-        <boxGeometry args={[2.5, 1.7, 0.06]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          roughness={0.2}
-          metalness={0.1}
-          transparent
-          opacity={0.92}
-        />
-      </mesh>
+    <group ref={rootRef} position={ch.actorPosition}>
+      {/* 1. Physical 3D Composer Window */}
+      <Composer position={[0, 0, 0]} />
 
-      {/* Recipient Field Pill */}
-      <mesh position={[-0.4, 0.5, 0.04]}>
-        <boxGeometry args={[1.4, 0.22, 0.02]} />
-        <meshStandardMaterial color="#f4f4f5" roughness={0.5} />
-      </mesh>
-
-      {/* Dynamic Content Lines */}
-      {[-0.05, -0.28, -0.51].map((y, idx) => (
-        <mesh key={idx} position={[0, y, 0.04]}>
-          <boxGeometry args={[2.0, 0.12, 0.01]} />
-          <meshStandardMaterial color={idx === 1 ? '#dcfce7' : '#e4e4e7'} roughness={0.6} />
-        </mesh>
-      ))}
-
-      {/* Send Button */}
-      <mesh position={[0.85, 0.5, 0.04]}>
-        <boxGeometry args={[0.5, 0.22, 0.02]} />
-        <meshStandardMaterial color="#16a34a" roughness={0.3} metalness={0.1} />
-      </mesh>
+      {/* 2. Dispatched Origami Plane on Send */}
+      <group ref={planeRef} visible={false}>
+        <OrigamiPlane scale={0.5} />
+      </group>
     </group>
   )
 }
