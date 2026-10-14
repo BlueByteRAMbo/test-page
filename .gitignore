@@ -16,6 +16,7 @@ dist
 /animation-frames/
 preview-*.png
 phase*-*.png
+final-*.png
 frame-audit.json
 
 # Environment variables
