@@ -12,7 +12,7 @@ export default function ProgressRail() {
   return (
     <nav
       aria-label="Chapter progress navigation"
-      className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-end gap-3.5"
+      className="absolute right-4 sm:right-6 lg:right-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-end gap-3.5"
     >
       {CHAPTERS.map((ch, idx) => {
         const isActive = activeChapter === idx

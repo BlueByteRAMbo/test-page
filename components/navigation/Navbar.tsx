@@ -27,8 +27,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-white border border-[#111111]/10 flex items-center justify-center p-1 shadow-sm transition-transform group-hover:scale-105">
-              <Image src="/logo.png" alt="Eextramile AI logo" width={32} height={32} className="w-full h-full object-contain" priority />
+            <div className="w-8 h-8 rounded-lg bg-white border border-[#111111]/10 flex items-center justify-center p-1.5 shadow-xs transition-transform group-hover:scale-105">
+              <Image src="/em-icon.svg" alt="Eextramile AI" width={22} height={22} className="w-full h-full object-contain" priority />
             </div>
             <div className="flex items-baseline font-medium tracking-tight text-lg text-[#111111]">
               <span className="text-[#16a34a] font-bold text-xl">E</span>

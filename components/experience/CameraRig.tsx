@@ -18,6 +18,7 @@ export default function CameraRig() {
     const isMobile = size.width < 1024
 
     // Safe area rectangle in pixels
+    const copyColumnRight = Math.max(560, (size.width - 1280) / 2 + 448 + 32)
     const safe = isMobile
       ? {
           left: 16,
@@ -26,8 +27,8 @@ export default function CameraRig() {
           bottom: Math.max(140, size.height * 0.52),
         }
       : {
-          left: Math.min(560, size.width * 0.40 + 24),
-          right: Math.max(600, size.width - 96),
+          left: copyColumnRight + 24, // 24px clear of copy column right edge
+          right: Math.max(copyColumnRight + 200, size.width - 96),
           top: 96,
           bottom: Math.max(200, size.height - 72),
         }
