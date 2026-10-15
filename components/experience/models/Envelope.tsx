@@ -17,9 +17,9 @@ interface EnvelopeProps {
 }
 
 /**
- * Handcrafted 3D Cotton Cardstock Envelope.
- * Real pocket with interior throat lining, hinged top triangular flap,
- * and lathed red wax medallion with embossed 'M' seal.
+ * Handcrafted 3D Warm White Cotton Cardstock Envelope.
+ * Real interior throat pocket, hinged triangular flap,
+ * and deep green (#14532d) satin wax medallion with an embossed 'E' monogram.
  */
 const Envelope = forwardRef<EnvelopeHandle, EnvelopeProps>(function Envelope(
   {
@@ -47,11 +47,12 @@ const Envelope = forwardRef<EnvelopeHandle, EnvelopeProps>(function Envelope(
     },
   }))
 
+  // Warm white 300gsm cotton paper material
   const paperMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: '#fdfcf9',
-        roughness: 0.82,
+        color: '#faf9f5',
+        roughness: 0.88,
         metalness: 0.02,
         side: THREE.DoubleSide,
       }),
@@ -62,28 +63,30 @@ const Envelope = forwardRef<EnvelopeHandle, EnvelopeProps>(function Envelope(
     () =>
       new THREE.MeshStandardMaterial({
         color: '#ece9e0',
-        roughness: 0.9,
+        roughness: 0.92,
         metalness: 0.0,
       }),
     []
   )
 
+  // Satin deep emerald wax material (#14532d)
   const waxMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: '#b91c1c',
-        roughness: 0.32,
-        metalness: 0.15,
+        color: '#14532d',
+        roughness: 0.45,
+        metalness: 0.08,
       }),
     []
   )
 
+  // Warm embossed gold monogram material
   const goldMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: '#d97706',
-        roughness: 0.25,
-        metalness: 0.8,
+        color: '#eab308',
+        roughness: 0.3,
+        metalness: 0.85,
       }),
     []
   )
@@ -168,25 +171,43 @@ const Envelope = forwardRef<EnvelopeHandle, EnvelopeProps>(function Envelope(
       >
         <mesh geometry={flapGeometry} material={paperMaterial} castShadow receiveShadow />
 
-        {/* 7. Lathed Wax Seal Medallion attached to the tip of the flap */}
+        {/* 7. Deep Emerald Satin Wax Seal Medallion with embossed 'E' monogram */}
         <group ref={sealGroupRef} position={[0, -0.62, 0.015]} visible={sealOpacity > 0.01}>
+          {/* Main Wax Body */}
           <mesh rotation={[Math.PI / 2, 0, 0]} material={waxMaterial} castShadow>
-            <cylinderGeometry args={[0.16, 0.16, 0.035, 32]} />
+            <cylinderGeometry args={[0.16, 0.165, 0.035, 48]} />
           </mesh>
 
-          <mesh position={[0, 0, 0.02]} rotation={[Math.PI / 2, 0, 0]} material={waxMaterial}>
-            <torusGeometry args={[0.13, 0.02, 16, 32]} />
+          {/* Organic Wax Rim */}
+          <mesh position={[0, 0, 0.018]} rotation={[Math.PI / 2, 0, 0]} material={waxMaterial}>
+            <torusGeometry args={[0.135, 0.025, 24, 48]} />
           </mesh>
 
-          <mesh position={[0, 0, 0.022]} material={goldMaterial}>
-            <boxGeometry args={[0.025, 0.12, 0.01]} />
+          {/* Inner Wax Monogram Bed */}
+          <mesh position={[0, 0, 0.016]}>
+            <circleGeometry args={[0.115, 32]} />
+            <meshStandardMaterial color="#0f3d20" roughness={0.5} />
           </mesh>
-          <mesh position={[-0.045, 0, 0.022]} material={goldMaterial}>
-            <boxGeometry args={[0.02, 0.12, 0.01]} />
-          </mesh>
-          <mesh position={[0.045, 0, 0.022]} material={goldMaterial}>
-            <boxGeometry args={[0.02, 0.12, 0.01]} />
-          </mesh>
+
+          {/* Embossed 'E' Monogram in warm gold */}
+          <group position={[0, 0, 0.024]}>
+            {/* Vertical Stem */}
+            <mesh position={[-0.032, 0, 0]} material={goldMaterial}>
+              <boxGeometry args={[0.022, 0.12, 0.008]} />
+            </mesh>
+            {/* Top Arm */}
+            <mesh position={[0.012, 0.048, 0]} material={goldMaterial}>
+              <boxGeometry args={[0.066, 0.02, 0.008]} />
+            </mesh>
+            {/* Middle Arm */}
+            <mesh position={[0.002, 0, 0]} material={goldMaterial}>
+              <boxGeometry args={[0.046, 0.018, 0.008]} />
+            </mesh>
+            {/* Bottom Arm */}
+            <mesh position={[0.012, -0.048, 0]} material={goldMaterial}>
+              <boxGeometry args={[0.066, 0.02, 0.008]} />
+            </mesh>
+          </group>
         </group>
       </group>
     </group>

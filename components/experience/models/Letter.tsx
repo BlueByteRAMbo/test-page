@@ -207,14 +207,14 @@ export default function Letter({ opacity = 1 }: LetterProps) {
       ctx.stroke()
     }
 
-    // Label
-    ctx.fillStyle = isChecked ? '#111111' : '#6b7280'
+    // Label (Enlarged and bold for screen legibility >= 12px)
+    ctx.fillStyle = isChecked ? '#0f172a' : '#334155'
     ctx.font = isChecked
-      ? '600 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-      : '400 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ? '700 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      : '600 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
-    ctx.fillText(text, 150, rowY + 12)
+    ctx.fillText(text, 150, rowY + 14)
   }
 
   // Initial draw
@@ -238,7 +238,7 @@ export default function Letter({ opacity = 1 }: LetterProps) {
     const netEmerge = clamp01(emergeT - retreatT)
 
     const slideY = netEmerge * 1.25
-    const slideZ = netEmerge > 0.5 ? 0.06 : 0.005
+    const slideZ = netEmerge > 0.4 ? 0.08 : 0.02
     rootRef.current.position.set(0, slideY, slideZ)
 
     // 2. Unfolding along crease joints
@@ -270,10 +270,10 @@ export default function Letter({ opacity = 1 }: LetterProps) {
       roughness: 0.85,
       metalness: 0.02,
       side: THREE.DoubleSide,
-      transparent: opacity < 0.99,
-      opacity,
+      transparent: false,
+      depthWrite: true,
     })
-  }, [texture, opacity])
+  }, [texture])
 
   return (
     <group ref={rootRef} position={[0, 0, 0.005]}>

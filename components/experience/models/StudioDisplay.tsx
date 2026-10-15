@@ -193,7 +193,7 @@ export default function StudioDisplay({
   const aluminumMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: '#27272a',
+        color: '#3f3f46',
         metalness: 0.88,
         roughness: 0.22,
         transparent: opacity < 0.99,
