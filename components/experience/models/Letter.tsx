@@ -5,6 +5,8 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, clamp01 } from '@/lib/scroll-store'
 
+import { makeCanvasTexture } from '@/lib/three-utils'
+
 interface LetterProps {
   opacity?: number
 }
@@ -41,7 +43,7 @@ export default function Letter({ opacity = 1 }: LetterProps) {
   const midGeometry = useMemo(() => createPanelGeometry(panelWidth, panelHeight, 0.333, 0.666), [])
   const botGeometry = useMemo(() => createPanelGeometry(panelWidth, panelHeight, 0.0, 0.333), [])
 
-  // Create High-Res Canvas and CanvasTexture
+  // Create High-Res Canvas and CanvasTexture with explicit sRGB tagging
   const { canvas, texture } = useMemo(() => {
     if (typeof document === 'undefined') {
       return { canvas: null, texture: null }
@@ -49,10 +51,7 @@ export default function Letter({ opacity = 1 }: LetterProps) {
     const c = document.createElement('canvas')
     c.width = 1024
     c.height = 1260
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
-    tex.anisotropy = 8
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
     return { canvas: c, texture: tex }

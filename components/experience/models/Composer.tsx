@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import { makeCanvasTexture } from '@/lib/three-utils'
 
 interface ComposerProps {
   position?: [number, number, number]
@@ -50,9 +51,7 @@ export default function Composer({
     const c = document.createElement('canvas')
     c.width = 1024
     c.height = 700
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
     return { canvas: c, texture: tex }
@@ -66,9 +65,7 @@ export default function Composer({
     const c = document.createElement('canvas')
     c.width = 512
     c.height = 120
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
 
     const ctx = c.getContext('2d')
     if (ctx) {
@@ -294,33 +291,53 @@ export default function Composer({
     }
   })
 
+  // Send Button Canvas Texture (256x90)
+  const sendLabelTexture = useMemo(() => {
+    if (typeof document === 'undefined') return null
+    const c = document.createElement('canvas')
+    c.width = 256
+    c.height = 90
+    const ctx = c.getContext('2d')
+    if (ctx) {
+      ctx.clearRect(0, 0, 256, 90)
+      ctx.fillStyle = '#ffffff'
+      ctx.font = '700 42px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('Send ↗', 128, 48)
+    }
+    return makeCanvasTexture(c, 8)
+  }, [])
+
   const faceMaterial = useMemo(() => {
     if (!texture) {
-      return new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.2 })
+      return new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false })
     }
-    return new THREE.MeshStandardMaterial({
+    return new THREE.MeshBasicMaterial({
       map: texture,
-      roughness: 0.2,
-      metalness: 0.02,
-      transparent: opacity < 0.99,
-      opacity,
+      toneMapped: false,
     })
-  }, [texture, opacity])
+  }, [texture])
 
   const toastMat = useMemo(() => {
-    if (!toastTexture) return new THREE.MeshBasicMaterial({ color: '#09090b' })
-    return new THREE.MeshBasicMaterial({ map: toastTexture })
+    if (!toastTexture) return new THREE.MeshBasicMaterial({ color: '#09090b', toneMapped: false })
+    return new THREE.MeshBasicMaterial({ map: toastTexture, toneMapped: false })
   }, [toastTexture])
+
+  const sendLabelMat = useMemo(() => {
+    if (!sendLabelTexture) return new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false })
+    return new THREE.MeshBasicMaterial({ map: sendLabelTexture, transparent: true, toneMapped: false })
+  }, [sendLabelTexture])
 
   return (
     <group ref={rootRef} position={position} rotation={rotation} scale={scale}>
-      {/* 1. Anodized Aluminum Chassis (Unibody Frame) */}
+      {/* 1. Anodized Aluminum Chassis (Thin Hairline Edge Frame) */}
       <mesh castShadow receiveShadow position={[0, 0, 0]}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial
           color="#d4d4d8"
-          metalness={0.9}
-          roughness={0.2}
+          metalness={0.85}
+          roughness={0.25}
           transparent={opacity < 0.99}
           opacity={opacity}
         />
@@ -328,7 +345,7 @@ export default function Composer({
 
       {/* 2. Front Screen Face with Dynamic Canvas */}
       <mesh position={[0, 0, depth / 2 + 0.002]}>
-        <planeGeometry args={[width - 0.04, height - 0.04]} />
+        <planeGeometry args={[width - 0.03, height - 0.03]} />
         <primitive object={faceMaterial} attach="material" />
       </mesh>
 
@@ -338,10 +355,10 @@ export default function Composer({
           <boxGeometry args={[0.34, 0.14, 0.02]} />
           <meshStandardMaterial color="#16a34a" roughness={0.3} metalness={0.2} />
         </mesh>
-        {/* Send Label Plane */}
+        {/* Send Label Plane with Crisp Typography */}
         <mesh position={[0, 0, 0.012]}>
           <planeGeometry args={[0.26, 0.09]} />
-          <meshBasicMaterial color="#ffffff" />
+          <primitive object={sendLabelMat} attach="material" />
         </mesh>
       </group>
 

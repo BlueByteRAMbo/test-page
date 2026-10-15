@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import { makeCanvasTexture } from '@/lib/three-utils'
 
 interface ChronometerProps {
   position?: [number, number, number]
@@ -46,9 +47,7 @@ export default function Chronometer({
     const c = document.createElement('canvas')
     c.width = 1024
     c.height = 1024
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
 
@@ -100,7 +99,7 @@ export default function Chronometer({
         ctx.stroke()
       }
 
-      // 4 Cadence Labels at Quadrants
+      // 4 Cadence Labels at Quadrants (Inset from bezel by > 6% of radius)
       const quadrants = [
         { text: 'DAY 1 · SENT', angle: -Math.PI / 2, color: '#22c55e' },
         { text: 'DAY 2 · WAITING', angle: 0, color: '#a8a29e' },
@@ -108,12 +107,12 @@ export default function Chronometer({
         { text: 'DAY 4 · AUTO REPLY', angle: Math.PI, color: '#10b981' },
       ]
 
-      ctx.font = '800 25px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.font = '800 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
 
       quadrants.forEach((q) => {
-        const labelR = dialR * 0.65
+        const labelR = dialR * 0.58
         const lx = center + Math.cos(q.angle) * labelR
         const ly = center + Math.sin(q.angle) * labelR
 
@@ -121,14 +120,10 @@ export default function Chronometer({
         ctx.fillText(q.text, lx, ly)
       })
 
-      // Center Brand Label
-      ctx.font = '700 20px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#a8a29e'
-      ctx.fillText('EEXTRAMILE CADENCE', center, center - 75)
-
-      ctx.font = '600 15px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#78716c'
-      ctx.fillText('4-DAY LIFECYCLE ENGINE', center, center + 80)
+      // Center Brand Label (Legible >= 20px)
+      ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#e7e5e4'
+      ctx.fillText('EEXTRAMILE CADENCE', center, center - 68)
 
       // Center jewel pivot
       ctx.fillStyle = '#dc2626'
@@ -177,18 +172,16 @@ export default function Chronometer({
 
         // Title
         ctx.textAlign = 'left'
-        ctx.font = '700 21px -apple-system, BlinkMacSystemFont, sans-serif'
-        ctx.fillStyle = '#0f172a'
+        ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = '#111111'
         ctx.fillText(c.title, 110, 42)
 
         // Status
-        ctx.font = '500 17px -apple-system, BlinkMacSystemFont, sans-serif'
-        ctx.fillStyle = '#64748b'
+        ctx.font = '500 18px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = '#626660'
         ctx.fillText(c.status, 110, 78)
       }
-      const tex = new THREE.CanvasTexture(cvs)
-      tex.generateMipmaps = true
-      return tex
+      return makeCanvasTexture(cvs, 8)
     })
   }, [])
 
@@ -232,28 +225,25 @@ export default function Chronometer({
 
   const dialMaterial = useMemo(() => {
     if (!texture) {
-      return new THREE.MeshStandardMaterial({ color: '#09090b', roughness: 0.4 })
+      return new THREE.MeshBasicMaterial({ color: '#09090b', toneMapped: false })
     }
-    return new THREE.MeshStandardMaterial({
+    return new THREE.MeshBasicMaterial({
       map: texture,
-      roughness: 0.35,
-      metalness: 0.4,
-      transparent: opacity < 0.99,
-      opacity,
+      toneMapped: false,
     })
-  }, [texture, opacity])
+  }, [texture])
 
   return (
     <group ref={rootRef} position={position} rotation={rotation} scale={scale}>
-      {/* 1. Main Lathed Chronometer Body (Positioned slightly left for breathing room) */}
-      <group position={[-0.35, 0.05, 0]}>
+      {/* 1. Main Lathed Chronometer Body (Positioned left for breathing room) */}
+      <group position={[-0.45, 0.05, 0]}>
         {/* Outer Titanium Bezel */}
         <mesh castShadow receiveShadow rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[radius, radius, 0.09, 64]} />
           <meshStandardMaterial
-            color="#292524"
-            metalness={0.92}
-            roughness={0.22}
+            color="#3a3937"
+            metalness={0.88}
+            roughness={0.24}
             transparent={opacity < 0.99}
             opacity={opacity}
           />
@@ -310,8 +300,8 @@ export default function Chronometer({
         </mesh>
       </group>
 
-      {/* 2. Floating Cadence Milestone Nodes (Right of Chronometer) */}
-      <group position={[0.75, 0.42, 0]}>
+      {/* 2. Floating Cadence Milestone Nodes (Shifted right by >= 0.15 units for clear badge visibility) */}
+      <group position={[1.18, 0.42, 0]}>
         {[0, 1, 2, 3].map((idx) => (
           <group key={idx} position={[0, -idx * 0.26, 0]}>
             {/* Card Mesh with Canvas Texture */}
@@ -325,9 +315,9 @@ export default function Chronometer({
             >
               <planeGeometry args={[1.35, 0.22]} />
               {cardTextures[idx] ? (
-                <meshBasicMaterial map={cardTextures[idx]} />
+                <meshBasicMaterial map={cardTextures[idx]} toneMapped={false} />
               ) : (
-                <meshStandardMaterial color="#ffffff" roughness={0.3} />
+                <meshBasicMaterial color="#ffffff" toneMapped={false} />
               )}
             </mesh>
 

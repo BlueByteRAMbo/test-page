@@ -8,24 +8,62 @@ import { scrollState, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
 
 export default function CameraRig() {
-  const { viewport } = useThree()
+  const { size } = useThree()
   const lookAtRef = useRef(new THREE.Vector3(0, 0, 0))
   const targetLookAt = useMemo(() => new THREE.Vector3(), [])
   const targetPos = useMemo(() => new THREE.Vector3(), [])
 
-  // Calculate waypoints and their midpoint progress values
+  // Derive dynamic waypoints from safe area bounds for desktop or stacked mobile layout
   const waypoints = useMemo(() => {
-    return CHAPTERS.map((ch) => ({
-      progress: (ch.range[0] + ch.range[1]) / 2,
-      position: new THREE.Vector3(...ch.camera.position),
-      target: new THREE.Vector3(...ch.camera.target),
-      fov: ch.camera.fov,
-    }))
-  }, [])
+    const isMobile = size.width < 1024
+
+    // Safe area rectangle in pixels
+    const safe = isMobile
+      ? {
+          left: 16,
+          right: Math.max(32, size.width - 16),
+          top: 72,
+          bottom: Math.max(140, size.height * 0.52),
+        }
+      : {
+          left: Math.min(560, size.width * 0.40 + 24),
+          right: Math.max(600, size.width - 96),
+          top: 96,
+          bottom: Math.max(200, size.height - 72),
+        }
+
+    const safeW = Math.max(100, safe.right - safe.left)
+    const safeH = Math.max(100, safe.bottom - safe.top)
+    const safeCx = (safe.left + safe.right) / 2
+    const safeCy = (safe.top + safe.bottom) / 2
+
+    return CHAPTERS.map((ch) => {
+      const bounds = ch.bounds || [2.4, 1.8]
+      const fov = ch.camera.fov || 39
+      const t = Math.tan(THREE.MathUtils.degToRad(fov / 2))
+
+      // 6% margin to guarantee actor stays completely inside the safe rectangle
+      const d = (1.06 * size.height * Math.max(bounds[1] / safeH, bounds[0] / safeW)) / (2 * t)
+      const pxPerUnit = size.height / (2 * d * t)
+
+      // Screen to 3D world offsets
+      const dx = (safeCx - size.width / 2) / pxPerUnit
+      const dy = (safeCy - size.height / 2) / pxPerUnit
+
+      const lookX = ch.actorPosition[0] - dx
+      const lookY = ch.actorPosition[1] + dy
+
+      return {
+        progress: (ch.range[0] + ch.range[1]) / 2,
+        position: new THREE.Vector3(lookX, lookY, d),
+        target: new THREE.Vector3(lookX, lookY, 0),
+        fov,
+      }
+    })
+  }, [size.width, size.height])
 
   useFrame((state, delta) => {
     const p = clamp01(scrollState.progress)
-    const isMobile = viewport.width < 5.5 // Rough three.js unit check for mobile aspect
 
     // Find the two waypoints we are currently between
     let i = 0
@@ -46,21 +84,11 @@ export default function CameraRig() {
     targetPos.lerpVectors(current.position, next.position, smoothT)
     targetLookAt.lerpVectors(current.target, next.target, smoothT)
 
-    let desiredFov = THREE.MathUtils.lerp(current.fov, next.fov, smoothT)
+    const desiredFov = THREE.MathUtils.lerp(current.fov, next.fov, smoothT)
 
-    // Mobile adjustments: center horizontally on actor (x = 1.1) and frame in upper 55%
-    if (isMobile) {
-      desiredFov += 8
-      targetPos.x = 1.1
-      targetPos.y = -0.52
-      targetPos.z += 1.2
-      targetLookAt.x = 1.1
-      targetLookAt.y = -0.52
-    }
-
-    // Pointer Parallax (Restrained to <= 0.18 units for subtle Apple-like depth)
-    const parallaxX = state.pointer.x * 0.15
-    const parallaxY = state.pointer.y * 0.12
+    // Subtle Apple-like pointer parallax
+    const parallaxX = state.pointer.x * 0.12
+    const parallaxY = state.pointer.y * 0.08
     targetPos.x += parallaxX
     targetPos.y += parallaxY
 

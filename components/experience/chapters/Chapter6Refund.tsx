@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import { makeCanvasTexture } from '@/lib/three-utils'
 import Coin from '../models/Coin'
 import Vault from '../models/Vault'
 
@@ -32,9 +33,7 @@ export default function Chapter6Refund() {
     const c = document.createElement('canvas')
     c.width = 512
     c.height = 320
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
 
@@ -56,45 +55,45 @@ export default function Chapter6Refund() {
       ctx.arc(24, 28, 6, 0, Math.PI * 2)
       ctx.fill()
 
-      ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.font = '700 20px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.fillStyle = '#ffffff'
       ctx.textAlign = 'left'
-      ctx.fillText('DELIVERY FAILURE DETECTED', 42, 33)
+      ctx.fillText('DELIVERY FAILURE DETECTED', 42, 35)
 
       // Details
-      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#f8fafc'
-      ctx.fillText('Alex Morgan · Scale AI', 24, 90)
+      ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('Alex Morgan · Scale AI', 24, 92)
 
-      ctx.font = '500 16px monospace'
-      ctx.fillStyle = '#94a3b8'
-      ctx.fillText('alex.morgan@scale.com', 24, 122)
+      ctx.font = '500 20px monospace'
+      ctx.fillStyle = '#cbd5e1'
+      ctx.fillText('alex.morgan@scale.com', 24, 124)
 
-      // Error Code Badge
+      // Error Code Badge (high contrast >= 4.5:1)
       ctx.fillStyle = '#450a0a'
       ctx.beginPath()
-      ctx.roundRect(24, 146, 360, 38, 8)
+      ctx.roundRect(24, 146, 380, 42, 8)
       ctx.fill()
       ctx.strokeStyle = '#ef4444'
       ctx.lineWidth = 1.5
       ctx.stroke()
 
-      ctx.font = '700 15px monospace'
-      ctx.fillStyle = '#fca5a5'
-      ctx.fillText('SMTP 550 5.1.1: Mailbox Unknown', 38, 171)
+      ctx.font = '700 20px monospace'
+      ctx.fillStyle = '#fecaca'
+      ctx.fillText('SMTP 550 5.1.1: Mailbox Unknown', 38, 174)
 
       // Shield Action
       ctx.fillStyle = '#064e3b'
       ctx.beginPath()
-      ctx.roundRect(24, 215, 380, 46, 8)
+      ctx.roundRect(24, 215, 420, 50, 8)
       ctx.fill()
       ctx.strokeStyle = '#10b981'
       ctx.lineWidth = 1.5
       ctx.stroke()
 
-      ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#6ee7b7'
-      ctx.fillText('🛡️ BOUNCE SHIELD: +1 CREDIT RECOVERY', 38, 244)
+      ctx.font = '700 20px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#a7f3d0'
+      ctx.fillText('🛡️ BOUNCE SHIELD: +1 CREDIT RECOVERY', 38, 247)
 
       tex.needsUpdate = true
     }
@@ -146,8 +145,8 @@ export default function Chapter6Refund() {
   })
 
   const bounceMat = useMemo(() => {
-    if (!texture) return new THREE.MeshBasicMaterial({ color: '#0f172a' })
-    return new THREE.MeshBasicMaterial({ map: texture })
+    if (!texture) return new THREE.MeshBasicMaterial({ color: '#0f172a', toneMapped: false })
+    return new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
   }, [texture])
 
   return (

@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import { makeCanvasTexture } from '@/lib/three-utils'
 
 interface VaultProps {
   position?: [number, number, number]
@@ -15,10 +16,11 @@ interface VaultProps {
 
 /**
  * Obsidian & Platinum Executive Credit Recovery Vault (Chapter 6).
- * - Machined dark titanium chassis with brushed platinum beveled trims
+ * - Obsidian chassis (#15171a, metalness 0.6, roughness 0.25)
+ * - Beveled platinum trims clearly catching environment reflections
  * - Top deposit slot with optical emerald sensor
  * - Massive circular vault door with rotating 3-spoke chrome wheel
- * - OLED digital counter that flashes and increments from 50 to 51 CREDITS
+ * - Unshaded OLED digital counter that flashes and increments 50 -> 51 CREDITS
  */
 export default function Vault({
   position = [0, 0, 0],
@@ -47,38 +49,39 @@ export default function Vault({
     const c = document.createElement('canvas')
     c.width = 512
     c.height = 256
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
 
     // Draw initial 50 CREDITS state
     const ctx = c.getContext('2d')
     if (ctx) {
-      ctx.fillStyle = '#0f172a'
+      ctx.fillStyle = '#0b0f14'
       ctx.fillRect(0, 0, c.width, c.height)
-      ctx.strokeStyle = '#475569'
+      ctx.strokeStyle = '#334155'
       ctx.lineWidth = 4
       ctx.strokeRect(6, 6, c.width - 12, c.height - 12)
 
       ctx.textAlign = 'center'
-      ctx.font = '700 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       ctx.fillStyle = '#94a3b8'
-      ctx.fillText('• EXECUTIVE CREDIT VAULT •', c.width / 2, 42)
+      ctx.fillText('• EXECUTIVE CREDIT VAULT •', c.width / 2, 40)
 
-      ctx.font = '800 46px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.font = '800 58px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       ctx.fillStyle = '#ffffff'
-      ctx.fillText('50 CREDITS', c.width / 2, 115)
+      ctx.fillText('50', c.width / 2 - 58, 115)
+      ctx.font = '700 24px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillStyle = '#94a3b8'
+      ctx.fillText('CREDITS', c.width / 2 + 42, 110)
 
       ctx.fillStyle = '#1e293b'
       ctx.beginPath()
-      ctx.roundRect(c.width / 2 - 120, 155, 240, 44, 10)
+      ctx.roundRect(c.width / 2 - 130, 150, 260, 46, 10)
       ctx.fill()
 
-      ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.fillStyle = '#cbd5e1'
-      ctx.fillText('BOUNCE SHIELD ACTIVE', c.width / 2, 183)
+      ctx.fillText('BOUNCE SHIELD ACTIVE', c.width / 2, 180)
 
       tex.needsUpdate = true
     }
@@ -95,44 +98,47 @@ export default function Vault({
     const h = canvas.height
 
     ctx.clearRect(0, 0, w, h)
-    ctx.fillStyle = '#0f172a'
+    ctx.fillStyle = '#0b0f14'
     ctx.fillRect(0, 0, w, h)
 
-    ctx.strokeStyle = isRefunded ? '#22c55e' : '#475569'
+    ctx.strokeStyle = isRefunded ? '#22c55e' : '#334155'
     ctx.lineWidth = 4
     ctx.strokeRect(6, 6, w - 12, h - 12)
 
     ctx.textAlign = 'center'
-    ctx.font = '700 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    ctx.font = '700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     ctx.fillStyle = '#94a3b8'
-    ctx.fillText('• EXECUTIVE CREDIT VAULT •', w / 2, 42)
+    ctx.fillText('• EXECUTIVE CREDIT VAULT •', w / 2, 40)
 
-    ctx.font = '800 46px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    ctx.font = '800 58px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     ctx.fillStyle = isRefunded ? '#4ade80' : '#ffffff'
-    const creditCount = isRefunded ? '51 CREDITS' : '50 CREDITS'
-    ctx.fillText(creditCount, w / 2, 115)
+    const num = isRefunded ? '51' : '50'
+    ctx.fillText(num, w / 2 - 58, 115)
+    ctx.font = '700 24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillStyle = isRefunded ? '#86efac' : '#94a3b8'
+    ctx.fillText('CREDITS', w / 2 + 42, 110)
 
     if (isRefunded) {
       ctx.fillStyle = '#14532d'
       ctx.beginPath()
-      ctx.roundRect(w / 2 - 130, 155, 260, 46, 10)
+      ctx.roundRect(w / 2 - 135, 150, 270, 48, 10)
       ctx.fill()
       ctx.strokeStyle = '#22c55e'
       ctx.lineWidth = 2
       ctx.stroke()
 
-      ctx.font = '700 20px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.font = '800 20px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.fillStyle = '#4ade80'
-      ctx.fillText('✓ +1 AUTO-REFUNDED', w / 2, 185)
+      ctx.fillText('✓ +1 AUTO-REFUNDED', w / 2, 182)
     } else {
       ctx.fillStyle = '#1e293b'
       ctx.beginPath()
-      ctx.roundRect(w / 2 - 120, 155, 240, 44, 10)
+      ctx.roundRect(w / 2 - 130, 150, 260, 46, 10)
       ctx.fill()
 
-      ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.fillStyle = '#cbd5e1'
-      ctx.fillText('BOUNCE SHIELD ACTIVE', w / 2, 183)
+      ctx.fillText('BOUNCE SHIELD ACTIVE', w / 2, 180)
     }
 
     texture.needsUpdate = true
@@ -165,26 +171,26 @@ export default function Vault({
     }
   })
 
+  // Unshaded OLED display material
   const oledMaterial = useMemo(() => {
     if (!texture) {
-      return new THREE.MeshBasicMaterial({ color: '#09090b' })
+      return new THREE.MeshBasicMaterial({ color: '#0b0f14', toneMapped: false })
     }
     return new THREE.MeshBasicMaterial({
       map: texture,
-      transparent: opacity < 0.99,
-      opacity,
+      toneMapped: false,
     })
-  }, [texture, opacity])
+  }, [texture])
 
   return (
     <group ref={rootRef} position={position} rotation={rotation} scale={scale}>
-      {/* 1. Vault Chassis (Machined Titanium with Subtle Sheen) */}
+      {/* 1. Vault Chassis (Obsidian with Reflective Environment Highlights) */}
       <mesh castShadow receiveShadow position={[0, 0, 0]}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial
-          color="#27272a"
-          metalness={0.88}
-          roughness={0.28}
+          color="#15171a"
+          metalness={0.6}
+          roughness={0.25}
           transparent={opacity < 0.99}
           opacity={opacity}
         />
@@ -200,7 +206,7 @@ export default function Vault({
       <group position={[0, height / 2 + 0.01, 0]}>
         <mesh castShadow>
           <boxGeometry args={[0.55, 0.04, 0.18]} />
-          <meshStandardMaterial color="#3f3f46" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#334155" metalness={0.88} roughness={0.2} />
         </mesh>
         {/* Optical Emerald Slot Aperture */}
         <mesh ref={slotSensorRef} position={[0, 0.022, 0]}>
@@ -219,7 +225,7 @@ export default function Vault({
       <group position={[0, -0.22, depth / 2 + 0.012]}>
         <mesh castShadow receiveShadow rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.42, 0.42, 0.045, 64]} />
-          <meshStandardMaterial color="#3f3f46" metalness={0.94} roughness={0.18} />
+          <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.2} />
         </mesh>
 
         {/* Outer Locking Bolts Rim */}

@@ -19,6 +19,7 @@ export interface ChapterData {
   range: [number, number]
   camera: ChapterCamera
   actorPosition: [number, number, number]
+  bounds: [number, number] // [width, height] in world units for dynamic safe area framing
 }
 
 export const CHAPTERS: ChapterData[] = [
@@ -35,11 +36,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Heavy 300gsm cardstock', 'Direct Gmail dispatch', 'Automated follow-ups'],
     range: [0.00, 0.14],
     camera: {
-      position: [0.35, 0.05, 4.8],
-      target: [0.55, 0, 0],
+      position: [0, 0.05, 4.8],
+      target: [0, 0, 0],
       fov: 39,
     },
-    actorPosition: [1.1, 0, 0],
+    actorPosition: [0, 0, 0],
+    bounds: [2.1, 1.5],
   },
   {
     id: 'highlights',
@@ -54,11 +56,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['3-panel origami sheet', '4 verified milestones', 'Zero template fluff'],
     range: [0.14, 0.28],
     camera: {
-      position: [0.35, 0.12, 4.4],
-      target: [0.55, 0.05, 0],
+      position: [0, 0.12, 4.4],
+      target: [0, 0.05, 0],
       fov: 38,
     },
-    actorPosition: [1.1, 0.1, 0],
+    actorPosition: [0, 0, 0],
+    bounds: [1.8, 2.3],
   },
   {
     id: 'discovery',
@@ -73,11 +76,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Faceted origami plane', 'Studio display workstation', '99% confidence lock'],
     range: [0.28, 0.44],
     camera: {
-      position: [0.35, 0.25, 5.3],
-      target: [0.35, 0.05, 0],
+      position: [0, 0.25, 5.3],
+      target: [0, 0.05, 0],
       fov: 40,
     },
-    actorPosition: [1.1, 0.1, 0],
+    actorPosition: [0, 0, 0],
+    bounds: [3.5, 1.8],
   },
   {
     id: 'personalize',
@@ -92,11 +96,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Dynamic letter composer', 'Natural tone synthesis', 'One-click verification'],
     range: [0.44, 0.60],
     camera: {
-      position: [0.35, 0.15, 4.6],
-      target: [0.55, 0.05, 0],
+      position: [0, 0.15, 4.6],
+      target: [0, 0.05, 0],
       fov: 39,
     },
-    actorPosition: [1.1, 0.05, 0],
+    actorPosition: [0, 0, 0],
+    bounds: [2.4, 1.9],
   },
   {
     id: 'followup',
@@ -111,11 +116,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Day 3 queued review', 'Day 4 automated send', 'Instant reply stop'],
     range: [0.60, 0.74],
     camera: {
-      position: [0.35, 0.1, 4.3],
-      target: [0.55, 0, 0],
+      position: [0, 0.1, 4.3],
+      target: [0, 0, 0],
       fov: 38,
     },
-    actorPosition: [1.1, 0, 0],
+    actorPosition: [-0.35, 0, 0],
+    bounds: [3.1, 1.9],
   },
   {
     id: 'refund',
@@ -130,11 +136,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Instant 1-credit return', 'Executive credit vault', 'Zero penalty promise'],
     range: [0.74, 0.88],
     camera: {
-      position: [0.35, 0.12, 4.7],
-      target: [0.65, 0, 0],
+      position: [0, 0.12, 4.7],
+      target: [0, 0, 0],
       fov: 40,
     },
-    actorPosition: [1.32, 0, 0],
+    actorPosition: [-0.15, 0, 0],
+    bounds: [2.8, 1.8],
   },
   {
     id: 'settle',
@@ -149,10 +156,11 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['25 free credits', 'Direct Gmail connect', 'Never expires'],
     range: [0.88, 1.00],
     camera: {
-      position: [0.35, -0.15, 5.1],
-      target: [0.55, -0.3, 0],
-      fov: 42,
+      position: [0, -0.15, 5.1],
+      target: [0, -0.1, 0],
+      fov: 40,
     },
-    actorPosition: [1.1, -0.25, 0],
+    actorPosition: [0, 0, 0],
+    bounds: [2.6, 2.0],
   },
 ]

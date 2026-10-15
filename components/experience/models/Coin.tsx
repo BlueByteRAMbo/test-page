@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { makeCanvasTexture } from '@/lib/three-utils'
 
 interface CoinProps {
   position?: [number, number, number]
@@ -14,7 +15,7 @@ interface CoinProps {
  * Minted 3D Physical Gold Credit Coin (Chapter 6: Bounce Shield).
  * - Lathed cylinder with milled ribbed edge
  * - High-res embossed gold face texture ("+1 CREDIT", "EEXTRAMILE SHIELD")
- * - 0.98 metalness, 0.16 roughness, warm gold emissive luster
+ * - 1.0 metalness, 0.22 roughness, bright gold reflective material
  */
 export default function Coin({
   position = [0, 0, 0],
@@ -36,9 +37,7 @@ export default function Coin({
     const c = document.createElement('canvas')
     c.width = 512
     c.height = 512
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
     return { canvas: c, texture: tex }
@@ -97,11 +96,9 @@ export default function Coin({
 
   const goldMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: '#f59e0b',
-      emissive: '#d97706',
-      emissiveIntensity: 0.18,
-      metalness: 0.95,
-      roughness: 0.16,
+      color: '#e6b422',
+      metalness: 1.0,
+      roughness: 0.22,
       transparent: opacity < 0.99,
       opacity,
     })
@@ -111,11 +108,9 @@ export default function Coin({
     if (!texture) return goldMaterial
     return new THREE.MeshStandardMaterial({
       map: texture,
-      color: '#fef08a',
-      emissive: '#d97706',
-      emissiveIntensity: 0.12,
-      metalness: 0.9,
-      roughness: 0.18,
+      color: '#fffbeb',
+      metalness: 0.95,
+      roughness: 0.22,
       transparent: opacity < 0.99,
       opacity,
     })

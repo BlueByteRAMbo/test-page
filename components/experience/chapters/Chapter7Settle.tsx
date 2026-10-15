@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { scrollState, chapterProgress, clamp01 } from '@/lib/scroll-store'
 import { CHAPTERS } from '@/data/chapters'
+import { makeCanvasTexture } from '@/lib/three-utils'
 import OrigamiPlane from '../models/OrigamiPlane'
 
 /**
@@ -29,9 +30,7 @@ export default function Chapter7Settle() {
     const c = document.createElement('canvas')
     c.width = 512
     c.height = 512
-    const tex = new THREE.CanvasTexture(c)
-    tex.generateMipmaps = true
-    tex.minFilter = THREE.LinearMipmapLinearFilter
+    const tex = makeCanvasTexture(c, 8)
     canvasRef.current = c
     textureRef.current = tex
 
@@ -61,20 +60,16 @@ export default function Chapter7Settle() {
       ctx.arc(center, center, center - 60, 0, Math.PI * 2)
       ctx.stroke()
 
-      // Center Brand & Credit Callout
+      // Center Brand & Credit Callout (Bold and uncluttered)
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.font = '800 26px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ctx.font = '800 58px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       ctx.fillStyle = '#0f172a'
-      ctx.fillText('LAUNCH READY', center, center - 32)
+      ctx.fillText('LAUNCH READY', center, center - 20)
 
-      ctx.font = '700 20px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.font = '700 28px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.fillStyle = '#15803d'
-      ctx.fillText('25 FREE CREDITS INCLUDED', center, center + 4)
-
-      ctx.font = '500 15px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#64748b'
-      ctx.fillText('Direct Gmail Connect · Zero Card Required', center, center + 38)
+      ctx.fillText('25 FREE CREDITS INCLUDED', center, center + 34)
 
       tex.needsUpdate = true
     }
@@ -99,11 +94,10 @@ export default function Chapter7Settle() {
   })
 
   const discMaterial = useMemo(() => {
-    if (!texture) return new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.3 })
-    return new THREE.MeshStandardMaterial({
+    if (!texture) return new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false })
+    return new THREE.MeshBasicMaterial({
       map: texture,
-      roughness: 0.3,
-      metalness: 0.15,
+      toneMapped: false,
     })
   }, [texture])
 
@@ -111,27 +105,27 @@ export default function Chapter7Settle() {
     <group ref={rootRef} position={ch.actorPosition}>
       {/* Plinth Stage tilted 24° towards camera for natural perspective */}
       <group position={[0, -0.2, 0]} rotation={[0.42, 0, 0]}>
-        {/* 1. Lathed Brushed Aluminum Plinth Body */}
+        {/* 1. Lathed Brushed Aluminum Plinth Body (128 segments to prevent aliasing) */}
         <mesh castShadow receiveShadow position={[0, -0.04, 0]}>
-          <cylinderGeometry args={[1.2, 1.25, 0.08, 64]} />
+          <cylinderGeometry args={[1.2, 1.25, 0.08, 128]} />
           <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.2} />
         </mesh>
 
         {/* 2. Plinth Top Surface with Emblem Texture */}
         <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[1.18, 64]} />
+          <circleGeometry args={[1.18, 128]} />
           <primitive object={discMaterial} attach="material" />
         </mesh>
 
         {/* 3. Glowing Emerald Accent Ring */}
         <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.96, 1.02, 64]} />
+          <ringGeometry args={[0.96, 1.02, 128]} />
           <meshBasicMaterial color="#22c55e" side={THREE.DoubleSide} />
         </mesh>
 
-        {/* 4. Ready-to-Launch Pristine Origami Plane */}
-        <group position={[0, 0.22, 0]} rotation={[-0.15, -0.35, 0.05]}>
-          <OrigamiPlane scale={0.7} />
+        {/* 4. Ready-to-Launch Pristine Origami Plane rested on the rim away from center text */}
+        <group position={[0.55, 0.1, -0.28]} rotation={[-0.1, -0.55, 0.08]}>
+          <OrigamiPlane scale={0.62} />
         </group>
       </group>
     </group>
