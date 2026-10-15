@@ -62,7 +62,7 @@ export default function Chapter3Discovery() {
       planeGroupRef.current.rotation.set(0, 0, 0)
     } else {
       // Perched on top bezel of Display A, clear of all key text
-      planeGroupRef.current.position.set(-1.22, 0.52, 0.08)
+      planeGroupRef.current.position.set(-1.08, 0.52, 0.08)
       planeGroupRef.current.rotation.set(-0.08, 0.22, -0.04)
     }
   })
@@ -85,7 +85,7 @@ export default function Chapter3Discovery() {
       {/* Display A: Sarah Chen (Target Lock Hero, Left of center) */}
       <group ref={displayARef}>
         <StudioDisplay
-          position={[-1.22, 0, 0.05]}
+          position={[-1.08, 0, 0.05]}
           rotation={[0, 0.22, 0]}
           recruiterName="Sarah Chen"
           recruiterCompany="Meta"
@@ -110,7 +110,7 @@ export default function Chapter3Discovery() {
 
       {/* Display C: Elena Rostova (Right of center) */}
       <StudioDisplay
-        position={[1.22, 0, -0.2]}
+        position={[1.08, 0, -0.15]}
         rotation={[0, -0.22, 0]}
         recruiterName="Elena Rostova"
         recruiterCompany="Stripe"

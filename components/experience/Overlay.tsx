@@ -27,7 +27,7 @@ export default function Overlay() {
             - Desktop (>= 1024px): anchored to fixed top at 34vh so headline never jumps
             - Mobile (< 1024px): anchored to bottom of upper 52% stage
         */}
-        <div className="mt-auto lg:mt-0 lg:absolute lg:top-[34vh] max-w-md xl:max-w-lg space-y-2.5 sm:space-y-3 pb-4 lg:pb-0">
+        <div className="mt-auto lg:mt-0 lg:absolute lg:top-[34vh] max-w-[390px] lg:max-w-[400px] space-y-2.5 sm:space-y-3 pb-4 lg:pb-0">
           <div
             key={`headline-${activeChapter}`}
             className="transition-all duration-400 ease-out animate-in fade-in slide-in-from-bottom-3 fill-mode-both"
