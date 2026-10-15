@@ -1,19 +1,9 @@
-const puppeteer = require('puppeteer-core');
+const { launchBrowser } = require('./browser-launcher');
 const path = require('path');
 const fs = require('fs');
 
 async function verifyPhase2() {
-  const browser = await puppeteer.launch({
-    executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-    headless: 'new',
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--enable-webgl',
-      '--use-gl=angle',
-      '--ignore-gpu-blocklist',
-    ]
-  });
+  const browser = await launchBrowser();
 
   const page = await browser.newPage();
 

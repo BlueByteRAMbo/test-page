@@ -1,54 +1,14 @@
-const puppeteer = require('puppeteer-core');
 const path = require('path');
 const fs = require('fs');
-
-function findBrowserPath() {
-  if (process.env.CHROME_PATH && fs.existsSync(process.env.CHROME_PATH)) {
-    return process.env.CHROME_PATH;
-  }
-  const candidates = [
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-    process.env.LOCALAPPDATA + '\\Google\\Chrome\\Application\\chrome.exe',
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/chromium',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-  ];
-  for (const c of candidates) {
-    if (c && fs.existsSync(c)) {
-      return c;
-    }
-  }
-  throw new Error('No compatible Chrome/Edge browser binary found. Set CHROME_PATH environment variable.');
-}
+const { launchBrowser } = require('./browser-launcher');
 
 async function verifyAll() {
-  const browserPath = findBrowserPath();
-  console.log(`Using browser binary: ${browserPath}`);
-
   const screenshotsDir = path.join(__dirname, '..', 'screenshots');
   if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir, { recursive: true });
   }
 
-  const browser = await puppeteer.launch({
-    executablePath: browserPath,
-    headless: 'new',
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--enable-webgl',
-      '--use-gl=angle',
-      '--use-angle=swiftshader',
-      '--enable-unsafe-swiftshader',
-      '--ignore-gpu-blocklist',
-    ],
-  });
-
+  const browser = await launchBrowser();
   const page = await browser.newPage();
 
   async function scrollToProgress(progress) {
