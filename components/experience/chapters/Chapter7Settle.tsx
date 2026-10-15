@@ -80,8 +80,8 @@ export default function Chapter7Settle() {
   useFrame(() => {
     if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.86) / 0.05)
-    const settleFade = clamp01((1.0 - p) / 0.06)
+    const enter = clamp01((p - 0.875) / 0.025)
+    const settleFade = clamp01((1.0 - p) / 0.05)
 
     rootRef.current.visible = enter > 0.01 && settleFade > 0.01
     if (!rootRef.current.visible) return

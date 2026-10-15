@@ -56,12 +56,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['3-panel origami sheet', '4 verified milestones', 'Zero template fluff'],
     range: [0.14, 0.28],
     camera: {
-      position: [0, 0.12, 4.4],
+      position: [0, 0.08, 4.4],
       target: [0, 0.05, 0],
       fov: 38,
     },
     actorPosition: [0, 0, 0],
-    bounds: [1.8, 2.3],
+    bounds: [2.0, 2.0],
   },
   {
     id: 'discovery',
@@ -76,12 +76,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Faceted origami plane', 'Studio display workstation', '99% confidence lock'],
     range: [0.28, 0.44],
     camera: {
-      position: [0, 0.25, 5.3],
+      position: [0, 0.2, 5.2],
       target: [0, 0.05, 0],
-      fov: 40,
+      fov: 39,
     },
     actorPosition: [0, 0, 0],
-    bounds: [3.5, 1.8],
+    bounds: [3.4, 1.6],
   },
   {
     id: 'personalize',
@@ -116,12 +116,12 @@ export const CHAPTERS: ChapterData[] = [
     chips: ['Day 3 queued review', 'Day 4 automated send', 'Instant reply stop'],
     range: [0.60, 0.74],
     camera: {
-      position: [0, 0.1, 4.3],
+      position: [0, 0.1, 4.4],
       target: [0, 0, 0],
       fov: 38,
     },
-    actorPosition: [-0.35, 0, 0],
-    bounds: [3.1, 1.9],
+    actorPosition: [0, 0, 0],
+    bounds: [3.3, 1.7],
   },
   {
     id: 'refund',
@@ -140,8 +140,8 @@ export const CHAPTERS: ChapterData[] = [
       target: [0, 0, 0],
       fov: 40,
     },
-    actorPosition: [-0.15, 0, 0],
-    bounds: [2.8, 1.8],
+    actorPosition: [0, 0, 0],
+    bounds: [2.8, 1.6],
   },
   {
     id: 'settle',

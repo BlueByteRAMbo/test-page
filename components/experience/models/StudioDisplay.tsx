@@ -39,12 +39,12 @@ export default function StudioDisplay({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const textureRef = useRef<THREE.CanvasTexture | null>(null)
 
-  // 1. Screen Dimensions
-  const screenWidth = 1.74
-  const screenHeight = 1.1
-  const chassisWidth = 1.84
-  const chassisHeight = 1.2
-  const chassisDepth = 0.05
+  // 1. Apple Pro Display XDR Proportions (Sleek hairline bezels, zero overlap)
+  const screenWidth = 1.20
+  const screenHeight = 0.76
+  const chassisWidth = 1.28
+  const chassisHeight = 0.84
+  const chassisDepth = 0.035
 
   // 2. Dynamic Canvas Texture for Screen Content
   const { canvas, texture } = useMemo(() => {
@@ -238,21 +238,21 @@ export default function StudioDisplay({
       </mesh>
 
       {/* 3. Aluminum Cantilever Stand with Cable Pass-through */}
-      <group position={[0, -chassisHeight / 2 - 0.22, -0.06]}>
+      <group position={[0, -chassisHeight / 2 - 0.16, -0.04]}>
         {/* Vertical Upright */}
-        <mesh position={[0, 0.12, 0]} material={standMaterial} castShadow>
-          <boxGeometry args={[0.22, 0.32, 0.04]} />
+        <mesh position={[0, 0.09, 0]} material={standMaterial} castShadow>
+          <boxGeometry args={[0.16, 0.22, 0.03]} />
         </mesh>
 
         {/* Cable Pass-through Hole Ring */}
-        <mesh position={[0, 0.12, 0.021]}>
-          <ringGeometry args={[0.045, 0.065, 32]} />
+        <mesh position={[0, 0.09, 0.016]}>
+          <ringGeometry args={[0.032, 0.048, 32]} />
           <meshBasicMaterial color="#18181b" />
         </mesh>
 
-        {/* Base Foot (Chamfered Oval / Box) */}
-        <mesh position={[0, -0.04, 0.12]} material={standMaterial} castShadow receiveShadow>
-          <boxGeometry args={[0.7, 0.03, 0.38]} />
+        {/* Base Foot (Chamfered Plate) */}
+        <mesh position={[0, -0.02, 0.08]} material={standMaterial} castShadow receiveShadow>
+          <boxGeometry args={[0.48, 0.02, 0.26]} />
         </mesh>
       </group>
     </group>

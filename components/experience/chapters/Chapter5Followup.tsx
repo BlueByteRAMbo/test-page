@@ -21,15 +21,22 @@ export default function Chapter5Followup() {
   useFrame(() => {
     if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.58) / 0.04)
-    const exit = clamp01((p - 0.74) / 0.03)
-    const activeWeight = enter * (1 - exit)
 
-    rootRef.current.visible = activeWeight > 0.01
+    // Active range for Chapter 5: 0.588 to 0.738 (clean isolation, zero overlap with Ch 4 or Ch 6)
+    const isVisible = p >= 0.588 && p <= 0.738
+    rootRef.current.visible = isVisible
     if (!rootRef.current.visible) return
 
-    // Subtle breathing scale
-    rootRef.current.scale.setScalar(0.92 + activeWeight * 0.08)
+    // Entrance & Exit Transitions
+    const enterT = clamp01((p - 0.588) / 0.022)
+    const exitT = clamp01((p - 0.722) / 0.016)
+
+    const enterY = (1 - enterT) * -0.4
+    const exitY = -exitT * 0.7
+    const scale = (0.9 + enterT * 0.1) * (1 - exitT * 0.35)
+
+    rootRef.current.position.y = ch.actorPosition[1] + enterY + exitY
+    rootRef.current.scale.setScalar(scale)
   })
 
   return (

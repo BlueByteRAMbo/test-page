@@ -37,7 +37,7 @@ export default function Chronometer({
   const textureRef = useRef<THREE.CanvasTexture | null>(null)
 
   const ch = CHAPTERS[4]
-  const radius = 0.70
+  const radius = 0.60
 
   // 1. High-Res Dial Canvas Texture (1024x1024)
   const { canvas, texture } = useMemo(() => {
@@ -99,31 +99,38 @@ export default function Chronometer({
         ctx.stroke()
       }
 
-      // 4 Cadence Labels at Quadrants (Inset from bezel by > 6% of radius)
+      // 4 Cadence Number Callouts at Quadrants (Large, bold, prominent)
       const quadrants = [
-        { text: 'DAY 1 · SENT', angle: -Math.PI / 2, color: '#22c55e' },
-        { text: 'DAY 2 · WAITING', angle: 0, color: '#a8a29e' },
-        { text: 'DAY 3 · QUEUED', angle: Math.PI / 2, color: '#f59e0b' },
-        { text: 'DAY 4 · AUTO REPLY', angle: Math.PI, color: '#10b981' },
+        { day: '1', label: 'DAY 1', angle: -Math.PI / 2, color: '#22c55e' },
+        { day: '2', label: 'DAY 2', angle: 0, color: '#94a3b8' },
+        { day: '3', label: 'DAY 3', angle: Math.PI / 2, color: '#f59e0b' },
+        { day: '4', label: 'DAY 4', angle: Math.PI, color: '#10b981' },
       ]
 
-      ctx.font = '800 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-
       quadrants.forEach((q) => {
-        const labelR = dialR * 0.58
-        const lx = center + Math.cos(q.angle) * labelR
-        const ly = center + Math.sin(q.angle) * labelR
+        const numR = dialR * 0.62
+        const nx = center + Math.cos(q.angle) * numR
+        const ny = center + Math.sin(q.angle) * numR
 
+        // Large Quadrant Number (>= 38px)
+        ctx.font = '800 40px -apple-system, BlinkMacSystemFont, "Segoe UI", monospace'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.fillStyle = q.color
-        ctx.fillText(q.text, lx, ly)
+        ctx.fillText(q.day, nx, ny - 6)
+
+        // Sub-label (>= 18px)
+        ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillStyle = '#a8a29e'
+        ctx.fillText(q.label, nx, ny + 20)
       })
 
-      // Center Brand Label (Legible >= 20px)
+      // Center Brand Label (Legible >= 22px)
       ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillStyle = '#e7e5e4'
-      ctx.fillText('EEXTRAMILE CADENCE', center, center - 68)
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#f5f5f4'
+      ctx.fillText('4-DAY CADENCE', center, center - 62)
 
       // Center jewel pivot
       ctx.fillStyle = '#dc2626'
@@ -140,46 +147,78 @@ export default function Chronometer({
     return { canvas: c, texture: tex }
   }, [])
 
-  // Milestone Cards with Dynamic Canvas Textures
+  // 4-Day Lifecycle Stepper Cards with High-Res Canvas Textures
   const cardTextures = useMemo(() => {
     if (typeof document === 'undefined') return []
     const cards = [
-      { day: 'Day 1', title: 'Personalized send via Gmail', status: '✓ Dispatched' },
-      { day: 'Day 2', title: 'Read receipt & profile check', status: 'In review' },
-      { day: 'Day 3', title: 'Contextual follow-up queued', status: 'Ready to send' },
-      { day: 'Day 4', title: 'Auto-send & instant reply stop', status: 'Converted' },
+      {
+        day: 'DAY 1',
+        title: 'Initial Outreach Dispatched',
+        subtitle: '✓ Delivered via Gmail · Outreach active',
+        badgeBg: '#dcfce7',
+        badgeColor: '#15803d',
+      },
+      {
+        day: 'DAY 2',
+        title: 'Read & Profile Review',
+        subtitle: 'Recruiter opened email · 48h reply grace period',
+        badgeBg: '#f1f5f9',
+        badgeColor: '#475569',
+      },
+      {
+        day: 'DAY 3',
+        title: 'Follow-up Draft Queued',
+        subtitle: '⚠️ Review prompt · Click to cancel or edit',
+        badgeBg: '#fef3c7',
+        badgeColor: '#b45309',
+      },
+      {
+        day: 'DAY 4',
+        title: 'Follow-up Auto-Dispatched',
+        subtitle: '⚡ No cancel requested → Follow-up auto-sent',
+        badgeBg: '#d1fae5',
+        badgeColor: '#065f46',
+      },
     ]
 
     return cards.map((c) => {
       const cvs = document.createElement('canvas')
-      cvs.width = 512
-      cvs.height = 110
+      cvs.width = 1024
+      cvs.height = 200
       const ctx = cvs.getContext('2d')
       if (ctx) {
+        // Clean white card background with hairline border
         ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, 512, 110)
-
-        // Day Pill
-        ctx.fillStyle = '#dcfce7'
         ctx.beginPath()
-        ctx.roundRect(14, 20, 80, 32, 8)
+        ctx.roundRect(8, 8, cvs.width - 16, cvs.height - 16, 20)
+        ctx.fill()
+        ctx.strokeStyle = '#e2e8f0'
+        ctx.lineWidth = 2.5
+        ctx.stroke()
+
+        // Day Pill (Left)
+        ctx.fillStyle = c.badgeBg
+        ctx.beginPath()
+        ctx.roundRect(32, 34, 130, 48, 12)
         ctx.fill()
 
-        ctx.font = '700 18px sans-serif'
-        ctx.fillStyle = '#15803d'
+        ctx.font = '800 22px -apple-system, BlinkMacSystemFont, monospace'
+        ctx.fillStyle = c.badgeColor
         ctx.textAlign = 'center'
-        ctx.fillText(c.day, 54, 43)
+        ctx.textBaseline = 'middle'
+        ctx.fillText(c.day, 97, 58)
 
-        // Title
+        // Title (Bold, high contrast)
         ctx.textAlign = 'left'
-        ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif'
-        ctx.fillStyle = '#111111'
-        ctx.fillText(c.title, 110, 42)
+        ctx.textBaseline = 'alphabetic'
+        ctx.font = '800 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+        ctx.fillStyle = '#0f172a'
+        ctx.fillText(c.title, 184, 68)
 
-        // Status
-        ctx.font = '500 18px -apple-system, BlinkMacSystemFont, sans-serif'
-        ctx.fillStyle = '#626660'
-        ctx.fillText(c.status, 110, 78)
+        // Subtitle / Rule (Clear, legible >= 24px)
+        ctx.font = '600 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+        ctx.fillStyle = '#64748b'
+        ctx.fillText(c.subtitle, 34, 142)
       }
       return makeCanvasTexture(cvs, 8)
     })
@@ -235,8 +274,8 @@ export default function Chronometer({
 
   return (
     <group ref={rootRef} position={position} rotation={rotation} scale={scale}>
-      {/* 1. Main Lathed Chronometer Body (Positioned left for breathing room) */}
-      <group position={[-0.45, 0.05, 0]}>
+      {/* 1. Main Lathed Chronometer Body (Positioned cleanly on the left) */}
+      <group position={[-0.85, 0.05, 0]}>
         {/* Outer Titanium Bezel */}
         <mesh castShadow receiveShadow rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[radius, radius, 0.09, 64]} />
@@ -300,11 +339,17 @@ export default function Chronometer({
         </mesh>
       </group>
 
-      {/* 2. Floating Cadence Milestone Nodes (Shifted right by >= 0.15 units for clear badge visibility) */}
-      <group position={[1.18, 0.42, 0]}>
+      {/* 2. 4-Day Lifecycle Cadence Stepper (Connected timeline cleanly on the right) */}
+      <group position={[0.85, 0.45, 0]}>
+        {/* Continuous Vertical Stepper Timeline Rail */}
+        <mesh position={[-0.78, -0.45, 0.005]}>
+          <planeGeometry args={[0.016, 0.92]} />
+          <meshBasicMaterial color="#e2e8f0" />
+        </mesh>
+
         {[0, 1, 2, 3].map((idx) => (
-          <group key={idx} position={[0, -idx * 0.26, 0]}>
-            {/* Card Mesh with Canvas Texture */}
+          <group key={idx} position={[0, -idx * 0.3, 0]}>
+            {/* High-Res Stepper Card */}
             <mesh
               ref={(el) => {
                 nodeBgsRef.current[idx] = el
@@ -313,7 +358,7 @@ export default function Chronometer({
               receiveShadow
               position={[0, 0, 0]}
             >
-              <planeGeometry args={[1.35, 0.22]} />
+              <planeGeometry args={[1.42, 0.26]} />
               {cardTextures[idx] ? (
                 <meshBasicMaterial map={cardTextures[idx]} toneMapped={false} />
               ) : (
@@ -321,14 +366,20 @@ export default function Chronometer({
               )}
             </mesh>
 
-            {/* Status Indicator Dot on Left Edge */}
+            {/* Stepper Node Outer Ring */}
+            <mesh position={[-0.78, 0, 0.01]}>
+              <ringGeometry args={[0.038, 0.048, 24]} />
+              <meshBasicMaterial color="#cbd5e1" />
+            </mesh>
+
+            {/* Stepper Node Center Indicator Dot */}
             <mesh
               ref={(el) => {
                 nodeDotsRef.current[idx] = el
               }}
-              position={[-0.72, 0, 0.01]}
+              position={[-0.78, 0, 0.012]}
             >
-              <circleGeometry args={[0.03, 16]} />
+              <circleGeometry args={[0.036, 24]} />
               <meshBasicMaterial color="#d4d4d8" />
             </mesh>
           </group>

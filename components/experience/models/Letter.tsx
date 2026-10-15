@@ -227,31 +227,31 @@ export default function Letter({ opacity = 1 }: LetterProps) {
     if (!rootRef.current || !topPanelRef.current || !bottomPanelRef.current) return
     const p = scrollState.progress
 
-    const isVisible = p >= 0.12 && p <= 0.35
+    const isVisible = p >= 0.12 && p <= 0.285
     rootRef.current.visible = isVisible
 
     if (!isVisible) return
 
     // 1. Emergence: slides up out of envelope pocket and steps forward into full view
-    const emergeT = clamp01((p - 0.13) / 0.05)
-    const retreatT = clamp01((p - 0.28) / 0.04)
+    const emergeT = clamp01((p - 0.13) / 0.04)
+    const retreatT = clamp01((p - 0.245) / 0.025)
     const netEmerge = clamp01(emergeT - retreatT)
 
-    const slideY = netEmerge * 1.25
+    const slideY = netEmerge * 0.38
     const slideZ = netEmerge > 0.4 ? 0.08 : 0.02
     rootRef.current.position.set(0, slideY, slideZ)
 
     // 2. Unfolding along crease joints
-    const unfoldT = clamp01((p - 0.16) / 0.05)
-    const refoldT = clamp01((p - 0.27) / 0.03)
+    const unfoldT = clamp01((p - 0.15) / 0.04)
+    const refoldT = clamp01((p - 0.24) / 0.025)
     const foldProgress = clamp01(1 - unfoldT + refoldT)
     const foldAngle = foldProgress * Math.PI * 0.98
 
     topPanelRef.current.rotation.x = -foldAngle
     bottomPanelRef.current.rotation.x = foldAngle
 
-    // 3. Milestones check calculation
-    const checkT = clamp01((p - 0.19) / 0.08)
+    // 3. Milestones check calculation: active during 0.17 to 0.235
+    const checkT = clamp01((p - 0.17) / 0.065)
     const checkProgress = checkT * 4
     const checkStep = Math.floor(checkProgress * 2)
 

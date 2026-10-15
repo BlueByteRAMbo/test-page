@@ -24,21 +24,21 @@ export default function Overlay() {
         </div>
 
         {/* Narrative Content Area:
-            - Desktop (>= 1024px): anchored to fixed top at 34vh so headline never jumps
+            - Desktop (>= 1024px): sits cleanly below eyebrow pill with balanced editorial spacing
             - Mobile (< 1024px): anchored to bottom of upper 52% stage
         */}
-        <div className="mt-auto lg:mt-0 lg:absolute lg:top-[34vh] max-w-[390px] lg:max-w-[400px] space-y-2.5 sm:space-y-3 pb-4 lg:pb-0">
+        <div className="mt-auto lg:mt-6 max-w-[420px] sm:max-w-[440px] lg:max-w-[460px] space-y-2.5 sm:space-y-3 pb-4 lg:pb-0">
           <div
             key={`headline-${activeChapter}`}
             className="transition-all duration-400 ease-out animate-in fade-in slide-in-from-bottom-3 fill-mode-both"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-medium leading-[1.08] tracking-[-0.035em] text-[#111111]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-medium leading-[1.1] tracking-[-0.035em] text-[#111111]">
               <span>{ch.titlePrefix} </span>
               <span className="italic font-serif font-normal text-[#111111]">{ch.titleItalic}</span>
               {ch.titleSuffix && <span> {ch.titleSuffix}</span>}
             </h2>
 
-            <p className="mt-2.5 sm:mt-3 max-w-md text-sm sm:text-base text-[#626660] leading-relaxed">
+            <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-[#626660] leading-relaxed">
               {ch.description}
             </p>
 
@@ -59,7 +59,7 @@ export default function Overlay() {
 
             {/* Primary CTA for Hero (Ch 1) and Final (Ch 7) */}
             {(activeChapter === 0 || activeChapter === 6) && (
-              <div className="pt-3.5">
+              <div className="pt-4">
                 <a
                   href="https://app.eextramile.com"
                   className="pointer-events-auto inline-flex items-center gap-2 text-[13px] sm:text-sm font-semibold text-white bg-[#16a34a] hover:bg-[#15803d] px-5 py-2.5 rounded-full shadow-xs hover:shadow transition-all group"

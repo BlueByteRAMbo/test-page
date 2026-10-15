@@ -104,31 +104,37 @@ export default function Chapter6Refund() {
   useFrame(() => {
     if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.72) / 0.04)
-    const exit = clamp01((p - 0.88) / 0.03)
-    const activeWeight = enter * (1 - exit)
-
-    rootRef.current.visible = activeWeight > 0.01
+    // Active range for Chapter 6: 0.74 to 0.88 (clean isolation, zero overlap with Ch 5 or Ch 7)
+    const isVisible = p >= 0.74 && p <= 0.88
+    rootRef.current.visible = isVisible
     if (!rootRef.current.visible) return
 
     const localP = chapterProgress(ch.range)
 
-    // Subtle scale breathing
-    rootRef.current.scale.setScalar(0.92 + activeWeight * 0.08)
+    // Entrance & Exit Transitions
+    const enterT = clamp01((p - 0.74) / 0.02)
+    const exitT = clamp01((p - 0.865) / 0.015)
+
+    const enterY = (1 - enterT) * -0.4
+    const exitY = -exitT * 0.6
+    const scale = (0.9 + enterT * 0.1) * (1 - exitT * 0.35)
+
+    rootRef.current.position.y = ch.actorPosition[1] + enterY + exitY
+    rootRef.current.scale.setScalar(scale)
 
     // Parabolic arc for 3D Gold Coin
     if (coinGroupRef.current) {
       if (localP < 0.16) {
         // Resting on the bounced terminal
         coinGroupRef.current.visible = true
-        coinGroupRef.current.position.set(-0.35, 0.15, 0.1)
+        coinGroupRef.current.position.set(-0.45, 0.15, 0.1)
         coinGroupRef.current.rotation.set(0, 0, 0)
         coinGroupRef.current.scale.setScalar(clamp01(localP / 0.15))
       } else if (localP <= 0.72) {
         // Parabolic trajectory towards vault slot at [0.78, 0.65, 0.0]
         coinGroupRef.current.visible = true
         const arcT = (localP - 0.16) / 0.56
-        const sx = -0.35
+        const sx = -0.45
         const ex = 0.78
         const currentX = sx + (ex - sx) * arcT
         const currentY = 0.15 + (0.65 - 0.15) * arcT + Math.sin(arcT * Math.PI) * 0.55
@@ -152,7 +158,7 @@ export default function Chapter6Refund() {
   return (
     <group ref={rootRef} position={ch.actorPosition}>
       {/* 1. Bounced Recruiter Notification Monitor (Shifted right to avoid text overlap) */}
-      <group ref={bounceScreenRef} position={[-0.35, 0.05, 0]} scale={0.75}>
+      <group ref={bounceScreenRef} position={[-0.45, 0.05, 0]} scale={0.75}>
         {/* Chassis */}
         <mesh castShadow receiveShadow>
           <boxGeometry args={[1.35, 0.95, 0.05]} />
@@ -166,7 +172,7 @@ export default function Chapter6Refund() {
       </group>
 
       {/* 2. Parabolic 3D Gold Credit Coin */}
-      <group ref={coinGroupRef} position={[-0.35, 0.15, 0.1]}>
+      <group ref={coinGroupRef} position={[-0.45, 0.15, 0.1]}>
         <Coin scale={0.85} />
       </group>
 

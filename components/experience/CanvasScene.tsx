@@ -54,19 +54,13 @@ export default function CanvasScene() {
         {/* Soft Contact Shadows grounding all 3D chapter actors */}
         <ContactShadows
           position={[0, -1.15, 0]}
-          opacity={0.18}
+          opacity={0.16}
           scale={10}
           blur={2.5}
           far={4.5}
           resolution={512}
           color="#0f172a"
         />
-
-        {/* Soft shadow receiving backplane */}
-        <mesh receiveShadow position={[0, 0, -0.5]}>
-          <planeGeometry args={[25, 25]} />
-          <shadowMaterial opacity={0.14} transparent />
-        </mesh>
 
         {/* 7 Chapter Actors in 3D */}
         <Chapter1Hero />

@@ -24,30 +24,37 @@ export default function Chapter4Personalize() {
   useFrame(() => {
     if (!rootRef.current) return
     const p = scrollState.progress
-    const enter = clamp01((p - 0.43) / 0.04)
-    const exit = clamp01((p - 0.60) / 0.03)
-    const activeWeight = enter * (1 - exit)
 
-    rootRef.current.visible = activeWeight > 0.01
+    // Active range for Chapter 4: 0.44 to 0.588 (cleanly isolated from Ch 3 and Ch 5)
+    const isVisible = p >= 0.44 && p <= 0.588
+    rootRef.current.visible = isVisible
     if (!rootRef.current.visible) return
 
     const localP = chapterProgress(ch.range)
 
-    // 1. Composer entrance & scale
-    rootRef.current.scale.setScalar(0.92 + activeWeight * 0.08)
+    // 1. Composer entrance & exit transitions
+    const enterT = clamp01((p - 0.44) / 0.025)
+    const exitT = clamp01((p - 0.565) / 0.022)
 
-    // 2. Dispatched Origami Plane Flight: 0.72 -> 1.0
+    const enterY = (1 - enterT) * -0.35
+    const exitY = -exitT * 0.75
+    const scale = (0.9 + enterT * 0.1) * (1 - exitT * 0.35)
+
+    rootRef.current.position.y = ch.actorPosition[1] + enterY + exitY
+    rootRef.current.scale.setScalar(scale)
+
+    // 2. Dispatched Origami Plane Flight upon Send button click
     if (planeRef.current) {
-      if (localP > 0.70) {
+      if (localP > 0.68) {
         planeRef.current.visible = true
-        const flightT = clamp01((localP - 0.70) / 0.28)
+        const flightT = clamp01((localP - 0.68) / 0.26)
         // Launches forward from right side of composer and banks away smoothly
-        const px = 0.4 + flightT * 1.1
-        const py = 0.1 + Math.sin(flightT * Math.PI) * 0.35
-        const pz = 0.08 + flightT * 0.9
+        const px = 0.4 + flightT * 1.3
+        const py = 0.05 + Math.sin(flightT * Math.PI) * 0.4
+        const pz = 0.08 + flightT * 1.1
         planeRef.current.position.set(px, py, pz)
         planeRef.current.rotation.set(-0.15, 0.3 + flightT * 0.4, -flightT * 0.35)
-        planeRef.current.scale.setScalar(0.48 + flightT * 0.15)
+        planeRef.current.scale.setScalar(0.48 + flightT * 0.18)
       } else {
         planeRef.current.visible = false
       }
